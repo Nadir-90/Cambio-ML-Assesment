@@ -1,0 +1,31 @@
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    env_file: .env
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - DATABASE_URL=sqlite+aiosqlite:////opt/.cua/sessiondb/sessions.db
+      - SESSION_IMAGE=cua-session:latest
+      - SESSION_NETWORK=cua-network
+      - WIDTH=1024
+      - HEIGHT=768
+    ports:
+      - "8000:8000"
+      - "6080:6080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - sessions_data:/opt/.cua/sessiondb
+    networks:
+      - cua-network
+    restart: unless-stopped
+
+networks:
+  cua-network:
+    name: cua-network
+    driver: bridge
+
+volumes:
+  sessions_data:

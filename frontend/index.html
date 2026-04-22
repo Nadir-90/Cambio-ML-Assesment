@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Energent — Computer Use Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="layout sidebar-open" id="layout">
+
+  <aside class="sidebar" aria-label="Sessions">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="8.5" cy="10" r="1.5" fill="currentColor"/>
+          <path d="M12 10h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="brand-name">Energent</span>
+      <span class="brand-badge">AI</span>
+    </div>
+    <div class="sidebar-header">
+      <button id="btn-new">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        New Session
+      </button>
+    </div>
+    <div id="session-list" role="list"></div>
+  </aside>
+
+  <main class="vnc-panel" aria-label="Desktop viewer">
+    <button id="btn-sidebar-toggle" aria-label="Toggle sessions sidebar" title="Toggle sidebar">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <button id="btn-audio" class="btn-audio" aria-label="Toggle audio" title="VM Audio">
+      <svg class="icon-muted" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+      </svg>
+      <svg class="icon-loud" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      </svg>
+    </button>
+    <div id="vnc-placeholder" class="vnc-placeholder">
+      <div class="vnc-placeholder-inner">
+        <div class="vnc-icon">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="8.5" cy="10" r="1.5" fill="currentColor" opacity="0.5"/>
+            <path d="M12 10h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="vnc-placeholder-title">No desktop active</div>
+        <div class="vnc-placeholder-hint">Open a session from the sidebar to view the remote desktop</div>
+      </div>
+    </div>
+    <iframe id="vnc-frame" style="display:none" allow="fullscreen" title="Remote desktop"></iframe>
+  </main>
+
+  <section class="chat-panel" aria-label="Chat">
+    <div class="chat-panel-header">
+      <span id="header-title">COMPUTER USE AGENT</span>
+    </div>
+    <div id="chat-panel-title" class="chat-session-title hidden">
+      <span id="chat-title-text"></span>
+      <button id="btn-stop" class="btn-stop" aria-label="Stop task">
+        <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><rect width="10" height="10" rx="1.5"/></svg>
+        Stop
+      </button>
+    </div>
+    <div id="chat-placeholder" class="chat-placeholder">
+      <div class="chat-placeholder-inner">
+        <div class="chat-placeholder-icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="chat-placeholder-title">No session selected</div>
+        <div class="chat-placeholder-hint">Create or open a session to begin</div>
+      </div>
+    </div>
+    <div id="chat-messages" role="log" aria-live="polite" style="display:none"></div>
+    <div class="chat-input-area">
+      <textarea
+        id="msg-input"
+        placeholder="Describe a task for the agent… (Enter to send)"
+        aria-label="Task input"
+        disabled
+      ></textarea>
+      <button id="btn-send" disabled aria-label="Send">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="file-panel">
+      <div class="file-panel-header">
+        <span>Files</span>
+        <div class="file-panel-actions">
+          <button id="btn-upload" title="Upload" disabled>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </button>
+          <button id="btn-refresh-files" title="Refresh" disabled>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div id="upload-menu" class="upload-menu">
+        <button class="upload-menu-item" data-mode="files">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          Files
+        </button>
+        <button class="upload-menu-item" data-mode="folder">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Folder
+        </button>
+      </div>
+      <div id="file-drop-zone" class="file-drop-zone" style="display:none">
+        <div class="drop-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div>Drop files here to upload</div>
+      </div>
+      <input type="file" id="file-input" multiple hidden>
+      <input type="file" id="folder-input" hidden webkitdirectory>
+      <div id="file-list" class="file-list"></div>
+    </div>
+  </section>
+
+</div>
+
+<div id="modal-overlay" class="modal-overlay" style="display:none">
+  <div class="modal-dialog">
+    <button id="modal-close" class="modal-close" aria-label="Cancel">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <h3 id="modal-title"></h3>
+    <p id="modal-message"></p>
+    <div id="modal-buttons" class="modal-buttons"></div>
+  </div>
+</div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>

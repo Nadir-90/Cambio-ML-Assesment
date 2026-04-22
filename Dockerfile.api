@@ -1,0 +1,39 @@
+FROM python:3.11-slim
+
+# Only what's needed for noVNC startup script (netstat) and cloning noVNC
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    git \
+    net-tools && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# noVNC + websockify — routes browser VNC connections to session containers
+RUN git clone --depth 1 --branch v1.5.0 https://github.com/novnc/noVNC.git /opt/noVNC && \
+    git clone --depth 1 --branch v0.12.0 https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
+    ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html
+
+ENV HOME=/root
+WORKDIR $HOME
+
+# Python dependencies
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# App code
+COPY backend/ /opt/.cua/backend/
+COPY frontend/ /opt/.cua/frontend/
+RUN chmod -R 700 /opt/.cua/ && mkdir -p /opt/.cua/sessiondb
+
+# Only the startup scripts the main app actually needs
+COPY image/entrypoint.sh ./entrypoint.sh
+COPY image/novnc_startup.sh ./novnc_startup.sh
+RUN chmod +x entrypoint.sh novnc_startup.sh
+
+ENV WIDTH=1024
+ENV HEIGHT=768
+ENV SESSION_IMAGE=cua-session:latest
+ENV SESSION_NETWORK=cua-network
+
+EXPOSE 8000 6080
+
+ENTRYPOINT ["./entrypoint.sh"]
