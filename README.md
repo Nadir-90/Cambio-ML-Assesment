@@ -6,7 +6,7 @@ A Docker-based computer-use agent powered by Anthropic's Claude. Each session dy
 
 ## Demo Video
 
-Attached with the email
+https://drive.google.com/file/d/1C0Nd9AClhU5rwYMWFfQEYDC32dfiz_sG/view?usp=sharing
 
 ## Architecture
 
